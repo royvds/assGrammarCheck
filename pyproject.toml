@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "assGrammarCheck"
+version = "0.1"
+authors = [
+  { name="royvds" },
+]
+description = "Tool to check for grammar mistakes in a .ass subtitle files using LanguageTool"
+readme = "README.md"
+license = { file="LICENSE" }
+requires-python = ">=3.9"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: GPL-3.0 license",
+    "Operating System :: OS Independent",
+]
+
+[project.scripts]
+assGrammarCheck = "assgrammarcheck.cli:main"
+
+[project.urls]
+"Homepage" = "https://github.com/royvds/assGrammarCheck/"
+"Bug Tracker" = "https://github.com/royvds/assGrammarCheck/issues"
