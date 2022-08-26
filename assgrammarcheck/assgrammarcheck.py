@@ -32,8 +32,8 @@ class AssGrammarChecker:
 
     def __init__(self, ignore_rules: list[str] = None, ignore_spelling: bool = False,
                  ignore_words: list[str] = None, ignore_informal: bool = False,
-                 ignore_categories: list[str] = None):
-        self.tool = language_tool_python.LanguageTool('en-US')
+                 ignore_categories: list[str] = None, language: str = 'en-US'):
+        self.tool = language_tool_python.LanguageTool(language)
         self.ignore_rules = [rule.upper() for rule in ignore_rules] or []
         self.ignore_words = [word.lower() for word in ignore_words] or []
         self.ignore_spelling = ignore_spelling
@@ -74,7 +74,7 @@ class AssGrammarChecker:
                 continue
             if match.ruleIssueType in self.ignore_categories:
                 continue
-            if match.ruleId == "MORFOLOGIK_RULE_EN_US" and \
+            if "MORFOLOGIK_RULE" in match.ruleId and \
                     (self.ignore_spelling or
                      (match.matchedText.lower() in self.ignore_words)):
                 continue

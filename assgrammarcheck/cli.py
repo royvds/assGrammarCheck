@@ -16,7 +16,7 @@ def startup(args):
     print("Setting up GrammarChecker and LanguageTool server...")
     checker = AssGrammarChecker(args.ignore_rules, args.ignore_spelling,
                                             args.ignore_words, args.ignore_informal,
-                                            args.ignore_categories)
+                                            args.ignore_categories, args.language)
     print("Done!")
     return checker
 
@@ -25,8 +25,8 @@ def check(subtitle, checker):
     """ Check subtitle for grammar mistakes using AssGrammarChecker """
     mistakes = checker.get_subtitle_mistakes(subtitle)
     # Format the data into something tabulate can properly show in console
-    output_table = [[mistake[0], match.message,
-                    checker.color_mistake_text(match), '; '.join(match.replacements)]
+    output_table = [[mistake[0], match.message, # Limit to max 10 replacements to limit clutter
+                    checker.color_mistake_text(match), '; '.join(match.replacements[:10])]
                     for mistake in mistakes for match in mistake[1]]
 
     t_width = os.get_terminal_size().columns
@@ -35,8 +35,8 @@ def check(subtitle, checker):
     print()
     print(os.path.basename(subtitle))
     # Slightly less than 100% of t_width in case of rounding errors
-    print(tabulate(output_table, maxcolwidths=[None, round(0.38 * t_width),
-                                               round(0.38 * t_width), round(0.15 * t_width)],
+    print(tabulate(output_table, maxcolwidths=[None, round(0.36 * t_width),
+                                               round(0.36 * t_width), round(0.15 * t_width)],
                    headers=["Line", "Language Error", "Line text", "Suggestions"]))
 
 
@@ -54,6 +54,8 @@ def main():
             help="Folder or file input")
     parser.add_argument('-uw', '--unknown-words', default=False, action="store_true",
                         help="Alternative mode: retrieve list of unkown/misspelled words")
+    parser.add_argument('-l', '--language',
+            help="Set language of subtitle. Default: en-US")
     parser.add_argument('-ii', '--ignore-informal', default=False, action="store_true",
             help="Don't flag informal language as grammar mistakes")
     parser.add_argument('-is', '--ignore-spelling', default=False, action="store_true",
