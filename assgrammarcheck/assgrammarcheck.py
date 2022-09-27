@@ -32,8 +32,8 @@ class AssGrammarChecker:
 
     def __init__(self, ignore_rules: list[str] = None, ignore_spelling: bool = False,
                  ignore_words: list[str] = None, ignore_informal: bool = False,
-                 ignore_categories: list[str] = None, language: str = 'en-US'):
-        self.tool = language_tool_python.LanguageTool(language)
+                 ignore_categories: list[str] = None, language: str = None):
+        self.tool = language_tool_python.LanguageTool(language or 'en-US')
         self.ignore_rules = [rule.upper() for rule in ignore_rules] or []
         self.ignore_words = [word.lower() for word in ignore_words] or []
         self.ignore_spelling = ignore_spelling
@@ -141,7 +141,7 @@ class AssGrammarChecker:
             index_offset = 2
             prev_event = subtitle.events[index-1]
             while not self.__is_dialogue_event(prev_event):
-                prev_event = subtitle.events[index+index_offset]
+                prev_event = subtitle.events[index-index_offset]
                 index_offset += 1
                 if index-index_offset < 0:
                     # In case the mistake was early on and we

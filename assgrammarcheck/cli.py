@@ -29,22 +29,17 @@ def check(subtitle, checker):
                     checker.color_mistake_text(match), '; '.join(match.replacements[:10])]
                     for mistake in mistakes for match in mistake[1]]
 
-    t_width = os.get_terminal_size().columns
 
-    print()
-    print()
-    print(os.path.basename(subtitle))
-    # Slightly less than 100% of t_width in case of rounding errors
-    print(tabulate(output_table, maxcolwidths=[None, round(0.36 * t_width),
-                                               round(0.36 * t_width), round(0.15 * t_width)],
-                   headers=["Line", "Language Error", "Line text", "Suggestions"]))
+    if len(output_table) > 0:
+        t_width = os.get_terminal_size().columns
+        print()
+        print()
+        print(os.path.basename(subtitle))
+        # Slightly less than 100% of t_width in case of rounding errors
+        print(tabulate(output_table, maxcolwidths=[None, round(0.36 * t_width),
+                                                round(0.36 * t_width), round(0.15 * t_width)],
+                    headers=["Line", "Language Error", "Line text", "Suggestions"]))
 
-
-def get_unknown_words(subtitle, checker):
-    """ Get a list of words that the grammar checker did not recognize.
-        Useful for creating a list of words that the grammar checker can ignore. """
-    unknown_words = checker.get_unknown_words(subtitle)
-    print('"' + '" "'.join(unknown_words) + '"')
 
 def main():
     """ Main Function """
@@ -73,17 +68,20 @@ def main():
     if os.path.isfile(args.input):
         grammar_checker = startup(args)
         if args.unknown_words:
-            get_unknown_words(args.input, grammar_checker)
+            print('"' + '" "'.join(grammar_checker.get_unknown_words(args.input)) + '"')
         else:
             check(args.input, grammar_checker)
         grammar_checker.close()
     elif os.path.isdir(args.input):
         subtitle_files = glob(f"{args.input}{os.path.sep}*.ass")
         grammar_checker = startup(args)
-        for subtitle in subtitle_files:
-            if args.unknown_words:
-                get_unknown_words(subtitle, grammar_checker)
-            else:
+        if args.unknown_words:
+            unknown_words = set()
+            for subtitle in subtitle_files:
+                unknown_words.update(grammar_checker.get_unknown_words(subtitle))
+            print('"' + '" "'.join(unknown_words) + '"')
+        else:
+            for subtitle in subtitle_files:
                 check(subtitle, grammar_checker)
         grammar_checker.close()
     else:
